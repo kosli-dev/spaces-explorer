@@ -67,14 +67,56 @@ const ResourceList = () => {
   }, [resources]);
   
   // Get tree paths sorted by depth (number of path segments)
+  // Filter out redundant entries for the current space
   const sortedPaths = useMemo(() => {
-    return Object.keys(resourceTree).sort((a, b) => {
-      const aDepth = a.split(' / ').length;
-      const bDepth = b.split(' / ').length;
-      if (aDepth !== bDepth) return aDepth - bDepth;
-      return a.localeCompare(b);
-    });
-  }, [resourceTree]);
+    // Early return if currentSpace is null
+    if (!currentSpace) return [];
+    
+    // Get the current space path and name
+    const currentSpacePath = flatSpaces.find(s => s.name === currentSpace.name)?.path || '';
+    const currentSpaceName = currentSpace.name;
+    
+    return Object.keys(resourceTree)
+      // Filter out paths that end with the current space name (redundant fold-outs)
+      .filter(path => {
+        const pathParts = path.split(' / ');
+        // If this is an exact match with the current space path, we want to keep it
+        if (path === currentSpacePath) return true;
+        
+        // Otherwise, check if the last part matches the current space name
+        // If so, it's redundant and should be filtered out
+        const lastPart = pathParts[pathParts.length - 1];
+        return lastPart !== currentSpaceName;
+      })
+      .sort((a, b) => {
+        const aDepth = a.split(' / ').length;
+        const bDepth = b.split(' / ').length;
+        if (aDepth !== bDepth) return aDepth - bDepth;
+        return a.localeCompare(b);
+      });
+  }, [resourceTree, currentSpace, flatSpaces]);
+  
+  // Get the relative path from the current space
+  const getRelativePath = (path) => {
+    if (!currentSpace) return path;
+    
+    // Get current space path
+    const currentSpacePath = flatSpaces.find(s => s.name === currentSpace.name)?.path || currentSpace.name;
+    
+    // If this is the current space, just return the last part
+    if (path === currentSpacePath) {
+      const parts = path.split(' / ');
+      return parts[parts.length - 1];
+    }
+    
+    // If this is a child path of the current space, return the relative path
+    if (path.startsWith(currentSpacePath + ' / ')) {
+      return path.substring(currentSpacePath.length + 3); // +3 for ' / '
+    }
+    
+    // Otherwise return the full path
+    return path;
+  };
   
   // Toggle expand/collapse for a path
   const toggleExpand = (path) => {
@@ -139,7 +181,7 @@ const ResourceList = () => {
                         <FolderIcon />
                       </ListItemIcon>
                       <ListItemText 
-                        primary={pathParts[pathParts.length - 1]} 
+                        primary={getRelativePath(path)} 
                         secondary={`${resourcesInPath.length} ${resourceTypeLabels[resourceType].toLowerCase()}`}
                       />
                       {isExpanded ? <ExpandMoreIcon /> : <ChevronRightIcon />}
