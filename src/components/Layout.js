@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
-import { Box, Drawer, AppBar, Toolbar, Typography, Divider, List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
+import { 
+  Box, 
+  Drawer, 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  Divider, 
+  List, 
+  ListItem, 
+  ListItemText, 
+  ListItemIcon,
+  Tabs,
+  Tab
+} from '@mui/material';
 import FolderIcon from '@mui/icons-material/Folder';
 import WebIcon from '@mui/icons-material/Web';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -13,21 +26,50 @@ import { useHierarchy } from '../hooks/useHierarchy';
 const drawerWidth = 240;
 
 const Layout = ({ onFileUpload }) => {
-  const { hierarchyData, setResourceType } = useHierarchy();
+  const { hierarchyData, resourceType, setResourceType } = useHierarchy();
   const [showFileUpload, setShowFileUpload] = useState(!hierarchyData);
 
-  const handleResourceTypeClick = (type) => {
-    setResourceType(type);
+  const handleTabChange = (event, newValue) => {
+    const resourceTypes = ['environments', 'flows', 'env_policies', 'attestation_types'];
+    setResourceType(resourceTypes[newValue]);
+  };
+  
+  // Get the current tab index based on the selected resource type
+  const getTabIndex = () => {
+    switch(resourceType) {
+      case 'environments': return 0;
+      case 'flows': return 1;
+      case 'env_policies': return 2;
+      case 'attestation_types': return 3;
+      default: return 0;
+    }
   };
 
   return (
     <>
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
-          <Typography variant="h6" noWrap component="div">
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Spaces Explorer
           </Typography>
         </Toolbar>
+        {hierarchyData && !showFileUpload && (
+          <Box sx={{ bgcolor: 'primary.dark' }}>
+            <Tabs 
+              value={getTabIndex()} 
+              onChange={handleTabChange}
+              centered
+              textColor="inherit"
+              indicatorColor="secondary"
+              aria-label="resource type tabs"
+            >
+              <Tab icon={<WebIcon />} label="Environments" />
+              <Tab icon={<AddCircleIcon />} label="Flows" />
+              <Tab icon={<SettingsIcon />} label="Environment Policies" />
+              <Tab icon={<VerifiedIcon />} label="Attestation Types" />
+            </Tabs>
+          </Box>
+        )}
       </AppBar>
       
       <Drawer
@@ -43,34 +85,7 @@ const Layout = ({ onFileUpload }) => {
       >
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
-          <List>
-            <ListItem button onClick={() => handleResourceTypeClick('environments')}>
-              <ListItemIcon>
-                <WebIcon />
-              </ListItemIcon>
-              <ListItemText primary="Environments" />
-            </ListItem>
-            <ListItem button onClick={() => handleResourceTypeClick('flows')}>
-              <ListItemIcon>
-                <AddCircleIcon />
-              </ListItemIcon>
-              <ListItemText primary="Flows" />
-            </ListItem>
-            <ListItem button onClick={() => handleResourceTypeClick('env_policies')}>
-              <ListItemIcon>
-                <SettingsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Env Policies" />
-            </ListItem>
-            <ListItem button onClick={() => handleResourceTypeClick('attestation_types')}>
-              <ListItemIcon>
-                <VerifiedIcon />
-              </ListItemIcon>
-              <ListItemText primary="Attestation Types" />
-            </ListItem>
-          </List>
-          <Divider />
-          <Typography variant="subtitle2" sx={{ p: 2 }}>
+          <Typography variant="subtitle2" sx={{ p: 2, pt: 3 }}>
             Spaces
           </Typography>
           <SpaceTree />
@@ -88,6 +103,9 @@ const Layout = ({ onFileUpload }) => {
       
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Toolbar />
+        {/* Extra space to account for the tabs */}
+        {hierarchyData && !showFileUpload && <Box sx={{ height: 48 }} />}
+        
         {showFileUpload ? (
           <FileUpload 
             onFileUpload={(data) => {

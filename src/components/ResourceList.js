@@ -41,10 +41,7 @@ const ResourceList = () => {
   return (
     <Box>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          {resourceTypeLabels[resourceType] || resourceType}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="h6" color="text.primary" gutterBottom>
           Current Space: {flatSpaces.find(s => s.name === currentSpace.name)?.path || currentSpace.name}
         </Typography>
         <Typography variant="body2" color="text.secondary">
