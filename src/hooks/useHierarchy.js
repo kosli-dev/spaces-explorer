@@ -91,11 +91,11 @@ export const HierarchyProvider = ({ children, hierarchyData }) => {
     const result = [];
     const cascadedResources = {};
     
+    // Find the current space's path in the hierarchy
+    const currentSpacePath = flatSpaces.find(s => s.name === currentSpace.name)?.path || currentSpace.name;
+    
     // If the resource type should cascade (env_policies or attestation_types)
     if (type === 'env_policies' || type === 'attestation_types') {
-      // Find the current space's path in the hierarchy
-      const currentSpacePath = flatSpaces.find(s => s.name === currentSpace.name)?.path;
-      
       if (currentSpacePath) {
         // Split path into space names
         const pathParts = currentSpacePath.split(' / ');
@@ -110,18 +110,27 @@ export const HierarchyProvider = ({ children, hierarchyData }) => {
             result.push({
               id: `${currentRoot.name} / ${type} / ${resource}`,
               name: resource,
-              path: currentRoot.name,
+              // Store ALL inherited resources directly in current space
+              path: currentSpacePath,
+              originalPath: currentRoot.name,
+              inheritedFromPath: currentRoot.name,
               type: type,
-              inherited: true
+              inherited: true,
+              directInCurrentSpace: false
             });
             cascadedResources[resource] = true;
           });
         }
         
         // Then work our way down the path, collecting resources from each parent space
-        for (let i = 1; i < pathParts.length - 1; i++) {
+        for (let i = 1; i < pathParts.length; i++) {
           const spaceName = pathParts[i];
           partialPath = partialPath ? `${partialPath} / ${spaceName}` : spaceName;
+          
+          // Skip if we've reached current space - we'll handle it separately
+          if (partialPath === currentSpacePath) {
+            continue;
+          }
           
           // Find this space in the tree
           let foundSpace = null;
@@ -147,9 +156,13 @@ export const HierarchyProvider = ({ children, hierarchyData }) => {
                 result.push({
                   id: `${partialPath} / ${type} / ${resource}`,
                   name: resource,
-                  path: partialPath,
+                  // Store ALL inherited resources directly in current space
+                  path: currentSpacePath,
+                  originalPath: partialPath,
+                  inheritedFromPath: partialPath,
                   type: type,
-                  inherited: true
+                  inherited: true,
+                  directInCurrentSpace: false
                 });
                 cascadedResources[resource] = true;
               }
@@ -159,8 +172,44 @@ export const HierarchyProvider = ({ children, hierarchyData }) => {
       }
     }
     
-    // Now collect resources from current space and its subspaces
-    return [...result, ...collectResources(currentSpace, type, '', [], cascadedResources)];
+    // Add resources from the current space itself
+    if (currentSpace[type] && Array.isArray(currentSpace[type])) {
+      currentSpace[type].forEach(resource => {
+        // For resources directly in the current space, we'll mark them as non-inherited
+        // even if they were previously added from parent (we override the inherited flag)
+        
+        // If resource was already added from a parent, remove it so we can add it as non-inherited
+        const existingIndex = result.findIndex(r => r.name === resource);
+        if (existingIndex >= 0) {
+          result.splice(existingIndex, 1);
+        }
+        
+        // Add the resource as belonging directly to this space
+        result.push({
+          id: `${currentSpacePath} / ${type} / ${resource}`,
+          name: resource,
+          path: currentSpacePath,
+          originalPath: currentSpacePath,
+          type: type,
+          inherited: false,
+          directInCurrentSpace: true
+        });
+        
+        // Mark it as seen to avoid duplicates
+        cascadedResources[resource] = true;
+      });
+    }
+    
+    // For non-cascading types or further subspaces, collect resources normally
+    // But mark that they belong directly to their spaces
+    const otherResources = collectResources(currentSpace, type, '', [], cascadedResources);
+    
+    // Add directInCurrentSpace flag
+    otherResources.forEach(resource => {
+      resource.directInCurrentSpace = resource.path === currentSpacePath;
+    });
+    
+    return [...result, ...otherResources];
   };
   
   // Get the spaces as a nested tree structure

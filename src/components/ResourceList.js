@@ -20,6 +20,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DescriptionIcon from '@mui/icons-material/Description';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
 const ResourceList = () => {
   const { resourceType, getResourcesOfType, currentSpace, flatSpaces } = useHierarchy();
@@ -49,12 +50,17 @@ const ResourceList = () => {
     
     if (!resources) return tree;
     
-    // Group resources by their path
+    // Group resources by their appropriate paths
     resources.forEach(resource => {
-      if (!tree[resource.path]) {
-        tree[resource.path] = [];
+      // Use the path from the resource
+      const path = resource.path;
+      
+      if (!tree[path]) {
+        tree[path] = [];
       }
-      tree[resource.path].push(resource);
+      
+      // Add the resource to its path's collection
+      tree[path].push(resource);
     });
     
     return tree;
@@ -148,15 +154,19 @@ const ResourceList = () => {
                           key={resource.id}
                           sx={{ 
                             pl: level + 3,
-                            ...(resource.inherited ? { backgroundColor: 'rgba(0, 0, 0, 0.04)' } : {})
+                            ...(resource.inherited ? { backgroundColor: 'rgba(65, 105, 225, 0.05)' } : {})
                           }}
                         >
                           <ListItemIcon sx={{ minWidth: 36 }}>
-                            {getResourceIcon(resourceType)}
+                            {resource.inherited 
+                              ? <ArrowUpwardIcon color="primary" fontSize="small" />
+                              : getResourceIcon(resourceType)}
                           </ListItemIcon>
                           <ListItemText 
                             primary={resource.name} 
-                            secondary={resource.inherited ? 'Inherited' : ''}
+                            secondary={resource.inherited 
+                              ? `Inherited from: ${resource.inheritedFromPath || resource.originalPath}`
+                              : ''}
                           />
                         </ListItem>
                       ))}
