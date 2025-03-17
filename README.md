@@ -58,6 +58,23 @@ Each space can contain:
 
 This project is a prototype for exploring hierarchical spaces. Contributions and suggestions are welcome!
 
+## Deployment
+
+### Deploying with Docker
+
+You can build and run the Docker image locally:
+
+```bash
+# Build the Docker image
+docker build -t spaces-explorer .
+
+# Run the container
+docker run -p 8080:8080 spaces-explorer
+```
+
+Then access the application at http://localhost:8080
+
+
 ## License
 
 This project is licensed under the MIT License.
