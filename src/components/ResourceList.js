@@ -48,7 +48,9 @@ const ResourceList = () => {
           Current Space: {currentSpace.name}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Showing resources for this space and all nested spaces below
+          {resourceType === 'env_policies' || resourceType === 'attestation_types' 
+            ? 'Showing resources for this space, all nested spaces below, and inherited from parent spaces'
+            : 'Showing resources for this space and all nested spaces below'}
         </Typography>
       </Box>
       
@@ -59,18 +61,27 @@ const ResourceList = () => {
               <TableRow>
                 <TableCell><strong>Name</strong></TableCell>
                 <TableCell><strong>Path</strong></TableCell>
+                {(resourceType === 'env_policies' || resourceType === 'attestation_types') && (
+                  <TableCell><strong>Inherited</strong></TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
               {resources.map((resource) => (
                 <TableRow
                   key={resource.id}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  sx={{ 
+                    '&:last-child td, &:last-child th': { border: 0 },
+                    ...(resource.inherited ? { backgroundColor: 'rgba(0, 0, 0, 0.04)' } : {})
+                  }}
                 >
                   <TableCell component="th" scope="row">
                     {resource.name}
                   </TableCell>
                   <TableCell>{resource.path}</TableCell>
+                  {(resourceType === 'env_policies' || resourceType === 'attestation_types') && (
+                    <TableCell>{resource.inherited ? 'Yes' : 'No'}</TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
