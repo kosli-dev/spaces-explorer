@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 
 const ResourceList = () => {
-  const { resourceType, getResourcesOfType, currentSpace } = useHierarchy();
+  const { resourceType, getResourcesOfType, currentSpace, flatSpaces } = useHierarchy();
   
   // Get all resources of the current type
   const resources = useMemo(() => {
@@ -45,7 +45,7 @@ const ResourceList = () => {
           {resourceTypeLabels[resourceType] || resourceType}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Current Space: {currentSpace.name}
+          Current Space: {flatSpaces.find(s => s.name === currentSpace.name)?.path || currentSpace.name}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {resourceType === 'env_policies' || resourceType === 'attestation_types' 
