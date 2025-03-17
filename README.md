@@ -60,6 +60,51 @@ This project is a prototype for exploring hierarchical spaces. Contributions and
 
 ## Deployment
 
+### Deploying to AWS S3 (Recommended)
+
+This is a static single-page application, making it perfect for hosting on AWS S3 with CloudFront:
+
+1. Build the application locally:
+   ```bash
+   npm install
+   npm run build
+   ```
+
+2. Create an S3 bucket in your AWS account with a unique name:
+   ```bash
+   aws s3 mb s3://your-spaces-explorer-bucket
+   ```
+
+3. Configure the bucket for static website hosting:
+   ```bash
+   aws s3 website s3://your-spaces-explorer-bucket --index-document index.html --error-document index.html
+   ```
+
+4. Set bucket policy to allow public access (if it's a public site):
+   ```json
+   {
+     "Version": "2012-10-17",
+     "Statement": [
+       {
+         "Sid": "PublicReadGetObject",
+         "Effect": "Allow",
+         "Principal": "*",
+         "Action": "s3:GetObject",
+         "Resource": "arn:aws:s3:::your-spaces-explorer-bucket/*"
+       }
+     ]
+   }
+   ```
+
+5. Upload the build folder to S3:
+   ```bash
+   aws s3 sync build/ s3://your-spaces-explorer-bucket
+   ```
+
+6. (Optional) Set up CloudFront for faster global access and HTTPS.
+
+Your application will be available at: `http://your-spaces-explorer-bucket.s3-website-[region].amazonaws.com`
+
 ### Deploying with Docker
 
 You can build and run the Docker image locally:
