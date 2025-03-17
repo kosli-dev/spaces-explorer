@@ -1,0 +1,155 @@
+# BigBankInc Resource Hierarchy
+
+- [org] BigBankInc
+    - { env. policies }
+        - security-policy-enterprise
+        - testing-policy-enterprise
+        - compliance-policy-enterprise
+    - { attestation types }
+        - coverage-metrics
+        - esoteric-security-tool
+        - regulatory-compliance-check
+    - [space] FX
+        - [space] Crypto
+            - { environments }
+                - FX-CRYPTO-DEV
+                - FX-CRYPTO-STAGING
+                - FX-CRYPTO-PROD
+            - { flows }
+                - fx-crypto-trading-engine-ci
+                - fx-crypto-wallet-service-ci
+                - fx-crypto-compliance-service-ci
+        - [space] Traditional
+            - { environments }
+                - FX-TRAD-DEV
+                - FX-TRAD-STAGING
+                - FX-TRAD-PROD
+            - { flows }
+                - fx-trad-trading-engine-ci
+                - fx-trad-settlement-service-ci
+        - [space] Emerging
+            - { environments }
+                - FX-EMRG-DEV
+                - FX-EMRG-STAGING
+                - FX-EMRG-PROD
+            - { flows }
+                - fx-emrg-trading-engine-ci
+                - fx-emrg-risk-analysis-ci
+    - [space] WealthManagement
+        - { attestation types }
+            - wm-investment-compliance-check
+            - wm-portfolio-audit
+        - [space] USA
+            - { attestation types }
+                - special-test-tool
+                - us-regulatory-check
+            - { environments }
+                - WM-USA-DEV-CLUSTER
+                - WM-USA-STAGING-CLUSTER
+                - WM-USA-PROD-CLUSTER
+            - [space] wm-usa-333-application
+                - { flows }
+                    - wm-usa-333-application-server-ci
+                    - wm-usa-333-application-frontend-ci
+                    - wm-usa-333-application-dataprocessing-ci
+                - { environments }
+                    - WM-USA-333-DEV
+                    - WM-USA-333-STAGING
+        - [space] Europe
+            - { environments }
+                - WM-EU-DEV-CLUSTER
+                - WM-EU-STAGING-CLUSTER
+                - WM-EU-PROD-CLUSTER
+            - { env. policies }
+                - gdpr-compliance-policy
+                - eu-security-standards-policy
+            - [space] UK
+                - [space] wm-uk-222-application
+                    - { flows }
+                        - wm-uk-222-application-server-ci
+                        - wm-uk-222-application-frontend-ci
+                        - wm-uk-222-application-payments-service-ci
+                    - { environments }
+                        - WM-UK-222-DEV
+                        - WM-UK-222-STAGING
+                - { attestation types }
+                    - uk-fca-compliance-check
+            - [space] Germany
+                - [space] wm-de-444-application
+                    - { flows }
+                        - wm-de-444-application-server-ci
+                        - wm-de-444-application-frontend-ci
+                    - { environments }
+                        - WM-DE-444-DEV
+                        - WM-DE-444-STAGING
+                - { attestation types }
+                    - bafin-compliance-check
+        - [space] Asia
+            - { environments }
+                - WM-ASIA-DEV-CLUSTER
+                - WM-ASIA-STAGING-CLUSTER
+                - WM-ASIA-PROD-CLUSTER
+            - [space] Singapore
+                - [space] wm-sg-555-application
+                    - { flows }
+                        - wm-sg-555-application-server-ci
+                        - wm-sg-555-application-frontend-ci
+                    - { environments }
+                        - WM-SG-555-DEV
+                        - WM-SG-555-STAGING
+                - { attestation types }
+                    - mas-compliance-check
+        - [space] RoW
+            - { environments }
+                - WM-ROW-DEV-CLUSTER
+                - WM-ROW-STAGING-CLUSTER
+                - WM-ROW-PROD-CLUSTER
+        - [space] wm-g-111-application
+            - { flows }
+                - wm-g-111-application-server-ci
+                - wm-g-111-application-frontend-ci
+                - wm-g-111-application-analytics-ci
+            - { environments }
+                - WM-G-111-DEV
+                - WM-G-111-STAGING
+                - WM-G-111-PROD
+            - { env. policies }
+                - wm-g-111-security-policy
+                - wm-g-111-testing-policy
+            - { attestation types }
+                - wm-g-111-performance-benchmark
+    - [space] ITOps
+        - { env. policies }
+            - itops-security-policy
+            - itops-disaster-recovery-policy
+        - [space] TestCoE
+            - [space] tc-444-application
+                - { flows }
+                    - tc-444-application-server-ci
+                    - tc-444-application-ui-ci
+                    - tc-444-application-integration-tests-ci
+                - { environments }
+                    - TC-444-DEV
+                    - TC-444-STAGING
+                    - TC-444-PROD
+                - { env. policies }
+                    - tc-444-testing-policy
+                - { attestation types }
+                    - tc-444-test-coverage
+                    - tc-444-performance-metrics
+        - [space] CloudPlatformEngineering
+            - [space] cpe-555-application
+                - { flows }
+                    - cpe-555-application-server-ci
+                    - cpe-555-application-dashboard-ci
+                    - cpe-555-application-monitoring-ci
+                - { environments }
+                    - CPE-555-DEV
+                    - CPE-555-STAGING
+                    - CPE-555-PROD
+                - { env. policies }
+                    - cpe-555-cloud-security-policy
+                    - cpe-555-resource-limits-policy
+                - { attestation types }
+                    - cpe-555-infrastructure-audit
+                    - cpe-555-compliance-scan
